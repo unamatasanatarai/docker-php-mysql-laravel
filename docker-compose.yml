@@ -1,0 +1,40 @@
+version: '2'
+services:
+
+  # The Application
+  app:
+    build:
+      context: ./
+      dockerfile: ./_docker/app.dockerfile
+    working_dir: /var/www
+    volumes:
+      - ./:/var/www
+    environment:
+      - "DB_PORT=3306"
+      - "DB_HOST=mysql"
+
+  # The Web Server
+  web:
+    build:
+      context: ./
+      dockerfile: ./_docker/web.dockerfile
+    working_dir: /var/www
+    volumes_from:
+      - app
+    ports:
+      - 8181:80
+
+  # The mysql
+  mysql:
+    image: mysql:5.7
+    environment:
+      - "MYSQL_DATABASE=superdomki"
+      - "MYSQL_USER=root"
+      - "MYSQL_PASSWORD=pass"
+      - "MYSQL_ROOT_PASSWORD=pass"
+    ports:
+      - "3306:3306"
+
+volumes:
+  dbdata:
+
