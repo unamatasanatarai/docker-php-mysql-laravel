@@ -9,6 +9,8 @@ and navigate to http://127.0.0.1:8181
 if you need more, have at it with the following commands:
 ```
 docker-compose exec app bash
+docker-compose exec app composer install
+docker-compose exec app php artisan migrate
 docker-compose exec web bash
 docker-compose exec mysql bash
 ```
