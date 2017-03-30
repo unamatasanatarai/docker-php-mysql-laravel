@@ -6,6 +6,8 @@ docker-compose up
 
 and navigate to http://127.0.0.1:8181
 
+Database is persisted inside `_docker/mysql_data/`
+
 if you need more, have at it with the following commands:
 ```
 docker-compose exec app bash
