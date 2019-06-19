@@ -23,6 +23,7 @@ services:
       - app
     ports:
       - 8181:80
+      - 8182:443
 
   # The mysql
   mysql:
