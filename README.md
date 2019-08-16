@@ -1,7 +1,7 @@
 Installs docker for php7, mysql 5.7, nginx, composer (available globally)
 
 ```
-docker-compose up
+./dock up
 ```
 
 and navigate to http://127.0.0.1:8181
@@ -11,11 +11,7 @@ Database is persisted inside `_docker/mysql_data/`
 
 if you need more, have at it with the following commands:
 ```
-docker-compose exec app bash
-docker-compose exec app composer install
-docker-compose exec app php artisan migrate
-docker-compose exec web bash
-docker-compose exec mysql bash
+./dock --help
 ```
 
 once in bash, you may install php extensions like so:
@@ -28,3 +24,8 @@ You may wish to generate your own certificate.
 cd _docker
 openssl req -x509 -nodes -days 365 -newkey rsa:2048 -keyout nginx.key -out nginx.crt
 ```
+
+
+Wish to destroy all docker things?
+
+https://gist.github.com/unamatasanatarai/58e10f6e654a7ede143a301519d0050c

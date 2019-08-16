@@ -1,0 +1,142 @@
+#!/usr/bin/env bash
+
+##
+# Docker environment manipulator
+##
+
+me=${0##*/}
+my_version=1.1
+my_name="Development environment manipulator v.$my_version"
+HELP="$my_name
+
+Usage:
+  $me [command] [argument(s)]
+
+Options:
+  --help, -h       Show this help
+
+Commands:
+  up [container?]              Spin up a container [?=all containers]
+                               @hack: use '--build' as container name to rebuild everything
+  down [container?]            Take down a container [?=all containers]
+  enter [container]            Enter container's sh shell
+  exec [container] [command]   Run a sh [command] directly on a [container]
+  ls                           List running docker containers
+"
+
+##
+# Utilities
+##
+
+seek_help="@seek --help"
+my_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
+conf_dir="${my_dir}/_docker"
+docker_network="dpml"
+docker_compose="docker-compose -p $docker_network"
+
+##
+# Did you pass any options?
+##
+
+print_help() {
+  printf "%s\n" "$HELP"
+  exit 0
+}
+
+for arg in $*; do
+  case $arg in
+    --help|-h )
+      print_help
+      ;;
+  esac
+done
+
+##
+# Common script functions
+##
+
+inform_about_sudo() {
+  local is_sudo=$(sudo -n -v 2>&1);test -z "$A" || echo $A|grep -q asswor
+  if [ ! -z "$is_sudo" ]; then
+    inform "Some commands require sudo."
+  fi
+  sudo -v
+}
+
+say() {
+  echo -en "$1"
+}
+
+say_done() {
+  say "\033[0;32mdone\033[0m\n"
+}
+
+inform() {
+  echo -e "\n ⚡  \033[0;36m${1}\033[0m\n"
+}
+
+
+
+##
+# Dispatcher
+##
+
+command=$1
+
+case $command in
+
+  ls )
+    inform_about_sudo
+    sudo docker ps -a --filter "name=${docker_network}_"
+    ;;
+
+  enter )
+    container=$2
+    cd $conf_dir
+    if [ -z "$container" ]; then
+      say "Please specify the container name\n${seek_help}\n"
+      exit 1
+    fi
+    inform_about_sudo
+    sudo $docker_compose exec $container sh
+    ;;
+
+  exec )
+    container=$2
+    command=$3
+    cd $conf_dir
+    if [ -z "$container" ]; then
+      say "Please specify the container name\n${seek_help}\n"
+      exit 1
+    fi
+    if [ -z "$command" ]; then
+      say "What command should I run?\n${seek_help}\n"
+      exit 1
+    fi
+    inform_about_sudo
+    sudo $docker_compose exec $container sh -c "$command"
+    ;;
+
+  up )
+    inform_about_sudo
+    container=$2
+    cd $conf_dir
+    sudo $docker_compose up -d $container
+    ;;
+
+  down )
+    inform_about_sudo
+    container=$2
+    cd $conf_dir
+    if [ -z $container ]; then
+      sudo $docker_compose down
+    else
+      sudo $docker_compose stop $container
+    fi
+    ;;
+
+  * )
+    echo -e "$my_name\n${seek_help}"
+    ;;
+
+esac

@@ -5,10 +5,10 @@ services:
   app:
     build:
       context: ./
-      dockerfile: ./_docker/app.dockerfile
+      dockerfile: ./app.dockerfile
     working_dir: /var/www
     volumes:
-      - ./:/var/www
+      - ./../:/var/www
     environment:
       - "DB_PORT=3306"
       - "DB_HOST=mysql"
@@ -17,7 +17,7 @@ services:
   web:
     build:
       context: ./
-      dockerfile: ./_docker/web.dockerfile
+      dockerfile: ./web.dockerfile
     working_dir: /var/www
     volumes_from:
       - app
@@ -29,9 +29,9 @@ services:
   mysql:
     build:
       context: ./
-      dockerfile: ./_docker/mysql.dockerfile
+      dockerfile: ./mysql.dockerfile
     environment:
-      - "MYSQL_DATABASE=superdomki"
+      - "MYSQL_DATABASE=db"
       - "MYSQL_USER=root"
       - "MYSQL_PASSWORD=pass"
       - "MYSQL_ROOT_PASSWORD=pass"
@@ -41,7 +41,7 @@ services:
       - "3306"
     restart: always
     volumes:
-     - ./_docker/mysql_data:/var/lib/mysql
+     - ./mysql_data:/var/lib/mysql
 
 volumes:
   dbdata:
